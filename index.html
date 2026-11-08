@@ -4,163 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THE GATE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&family=VT323&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&display=swap');
 
         body {
-            background-color: #020000;
-            color: #ff1a1a;
-            font-family: 'Special Elite', monospace;
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at center, #1a0000 0%, #080000 50%, #000000 100%);
             height: 100vh;
-            overflow: hidden;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            position: relative;
-            cursor: crosshair;
-        }
-
-        /* Living Animated Background Fog */
-        .fog-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            color: #ff1a1a;
+            font-family: 'Special Elite', monospace;
             overflow: hidden;
-            z-index: 1;
-            pointer-events: none;
+            animation: pulse-bg 4s infinite alternate;
         }
 
-        .fog {
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            background: radial-gradient(circle, rgba(120, 0, 0, 0.25) 0%, rgba(20, 0, 0, 0.85) 60%, rgba(0, 0, 0, 0.98) 100%);
-            animation: swirl-fog 20s linear infinite alternate;
-        }
-
-        .fog2 {
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            background: radial-gradient(circle, rgba(180, 10, 10, 0.2) 0%, rgba(30, 0, 0, 0.6) 50%, transparent 80%);
-            animation: swirl-fog-reverse 30s linear infinite alternate;
-            mix-blend-mode: screen;
-        }
-
-        @keyframes swirl-fog {
-            0% { transform: translate(-10%, -10%) rotate(0deg) scale(1); }
-            50% { transform: translate(10%, 5%) rotate(180deg) scale(1.1); }
-            100% { transform: translate(-5%, 10%) rotate(360deg) scale(1); }
-        }
-
-        @keyframes swirl-fog-reverse {
-            0% { transform: translate(5%, 10%) rotate(360deg) scale(1.05); }
-            50% { transform: translate(-10%, -5%) rotate(180deg) scale(0.95); }
-            100% { transform: translate(10%, -10%) rotate(0deg) scale(1.05); }
-        }
-
-        #emberCanvas, #glassCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        #emberCanvas {
-            z-index: 2;
-        }
-
-        #glassCanvas {
-            z-index: 10; /* Sits right over everything like wet glass */
+        @keyframes pulse-bg {
+            0% { background: radial-gradient(circle at center, #1a0000 0%, #080000 50%, #000000 100%); }
+            100% { background: radial-gradient(circle at center, #330000 0%, #120000 60%, #000000 100%); }
         }
 
         .container {
-            z-index: 20;
-            text-align: center;
-            border: 2px solid rgba(255, 26, 26, 0.5);
+            border: 2px solid #ff1a1a;
             padding: 40px;
-            background: rgba(8, 0, 0, 0.88);
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.4), inset 0 0 25px rgba(255, 0, 0, 0.2);
-            max-width: 700px;
-            width: 90%;
-            animation: pulse-border 4s infinite;
+            background: rgba(10, 0, 0, 0.85);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4), inset 0 0 20px rgba(255, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
         }
 
         h1 {
             font-family: 'Creepster', cursive;
-            font-size: 4rem;
-            color: #ff0000;
-            text-shadow: 0 0 10px #ff0000, 0 0 20px #990000, 0 0 30px #4d0000;
+            font-size: 3.5rem;
             letter-spacing: 3px;
-            margin-bottom: 10px;
-            animation: glitch 2s infinite;
+            color: #ff0000;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #990000, 0 0 30px #4d0000;
         }
 
-        .date-sub {
-            font-size: 1.2rem;
+        .date {
+            font-size: 0.9rem;
+            letter-spacing: 2px;
             color: #aa5555;
             margin-bottom: 30px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
         }
 
-        .countdown-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 35px;
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .time-box {
-            background: #0d0202;
-            border: 1px solid #731a1a;
-            padding: 15px 10px;
-            box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.3);
+            border: 1px solid #ff1a1a;
+            padding: 15px 20px;
+            min-width: 60px;
+            background: rgba(20, 0, 0, 0.6);
+            box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.3);
         }
 
-        .time-value {
-            font-family: 'VT323', monospace;
-            font-size: 3.2rem;
+        .number {
+            font-size: 2rem;
+            font-weight: bold;
             color: #ff3333;
-            text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+            text-shadow: 0 0 8px #ff0000;
         }
 
-        .time-label {
-            font-size: 0.75rem;
+        .label {
+            font-size: 0.7rem;
             color: #884444;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             margin-top: 5px;
+            letter-spacing: 1px;
         }
 
         .signal-btn {
             background: transparent;
             color: #ff1a1a;
             border: 1px solid #ff1a1a;
-            padding: 12px 25px;
+            padding: 10px 20px;
             font-family: 'Special Elite', monospace;
-            font-size: 1rem;
-            cursor: pointer;
-            text-transform: uppercase;
             letter-spacing: 2px;
+            cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-            margin-bottom: 20px;
         }
 
         .signal-btn:hover {
@@ -169,94 +98,49 @@
             box-shadow: 0 0 20px #ff0000;
         }
 
-        .transmission-box {
-            min-height: 60px;
-            font-family: 'VT323', monospace;
-            font-size: 1.4rem;
-            color: #ff3333;
-            text-shadow: 0 0 5px rgba(255, 0, 0, 0.6);
-            padding: 10px;
-            border-top: 1px dashed #4a0d0d;
-        }
-
-        .translation {
-            font-size: 0.9rem;
+        .transmission {
+            margin-top: 25px;
+            font-size: 0.85rem;
             color: #aa3333;
-            margin-top: 5px;
-            font-style: italic;
+            letter-spacing: 1px;
+            animation: flicker 2s infinite;
         }
 
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-
-        @keyframes pulse-border {
-            0% { border-color: rgba(255, 26, 26, 0.3); box-shadow: 0 0 30px rgba(255, 0, 0, 0.2); }
-            50% { border-color: rgba(255, 0, 0, 0.8); box-shadow: 0 0 70px rgba(255, 0, 0, 0.5); }
-            100% { border-color: rgba(255, 26, 26, 0.3); box-shadow: 0 0 30px rgba(255, 0, 0, 0.2); }
-        }
-
-        @media (max-width: 600px) {
-            .countdown-grid { grid-template-columns: repeat(2, 1fr); }
-            h1 { font-size: 3rem; }
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.4; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Living Animated Fog Layers -->
-    <div class="fog-container">
-        <div class="fog"></div>
-        <div class="fog2"></div>
-    </div>
-
-    <canvas id="emberCanvas"></canvas>
-    <canvas id="glassCanvas"></canvas>
-
     <div class="container">
         <h1>THE GATE</h1>
-        <div class="date-sub">January 18, 2027 · 8:00 PM Egypt Time</div>
-
-        <div class="countdown-grid">
+        <div class="date">JANUARY 18, 2027 · 8:00 PM EGYPT TIME</div>
+        
+        <div class="countdown">
             <div class="time-box">
-                <div class="time-value" id="days">00</div>
-                <div class="time-label">Days</div>
+                <div class="number">71</div>
+                <div class="label">DAYS</div>
             </div>
             <div class="time-box">
-                <div class="time-value" id="hours">00</div>
-                <div class="time-label">Hours</div>
+                <div class="number">18</div>
+                <div class="label">HOURS</div>
             </div>
             <div class="time-box">
-                <div class="time-value" id="minutes">00</div>
-                <div class="time-label">Minutes</div>
+                <div class="number">11</div>
+                <div class="label">MINUTES</div>
             </div>
             <div class="time-box">
-                <div class="time-value" id="seconds">00</div>
-                <div class="time-label">Seconds</div>
+                <div class="number">21</div>
+                <div class="label">SECONDS</div>
             </div>
         </div>
 
-        <button class="signal-btn" onclick="decodeSignal()">Decode The Signal</button>
-
-        <div class="transmission-box" id="transmission">
-            [AWAITING TRANSMISSION...]
-            <div class="translation" id="translation"></div>
-        </div>
+        <button class="signal-btn">[DECODE THE SIGNAL]</button>
+        
+        <div class="transmission">[AWAITING TRANSMISSION...]</div>
     </div>
 
-    <script>
-        const targetDate = new Date('2027-01-18T20:00:00+02:00').getTime();
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
-
-            if (distance < 0) {
-                document.getElementById('days').innerText = "00";
-                document.getElementById('hours').innerText = "00";
-                document.getElementById('minutes').innerText = "00
+</body>
+</html>
