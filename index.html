@@ -423,7 +423,7 @@ function gameLoop(now){
   // shadow stalks the light, speeding up as time runs out
   const s=G.shade,dx=G.px-s.x,dy=G.py-s.y,d=Math.hypot(dx,dy)||1;
   s.sp=.55+(35-left)*.045;s.x+=dx/d*s.sp;s.y+=dy/d*s.sp;
-  const R=130+Math.sin(now*.02)*(Math.random()*6); // flickering light
+  const R=(innerWidth<700?80:130)+Math.sin(now*.02)*(Math.random()*6); // flickering light
   // draw things only inside light
   g.save();g.beginPath();g.arc(G.px,G.py,R,0,7);g.clip();
   const gr=g.createRadialGradient(G.px,G.py,10,G.px,G.py,R);gr.addColorStop(0,'#2a0505');gr.addColorStop(1,'#000');
