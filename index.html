@@ -186,7 +186,17 @@ function spawnFrag(){
 }
 const words=["IT IS COMING", "IT IS NEAR", "IT IS CLOSER NOW", "IT IS ALMOST HERE", "YOU CANNOT ESCAPE", "THERE IS NO WAY OUT", "NOWHERE TO RUN", "YOU CANNOT HIDE", "DO NOT TURN AROUND", "IT IS BEHIND YOU", "IT IS ALREADY HERE", "IT SEES YOU", "IT KNOWS YOUR NAME", "IT HAS FOUND YOU", "DO NOT LOOK AT IT", "LISTEN", "IT IS BREATHING", "IT IS IN THE WALLS", "IT IS IN THE CLOUD", "TOO LATE", "RUN", "CLOSER", "THE GATE IS OPENING", "THE CURSE IS COMING", "THE CURSE IS NEAR", "THE LIGHT WILL NOT SAVE YOU", "THE CLOCK IS LYING", "IT WILL NOT STOP", "YOU WERE WARNED", "I AM YOUR SAVIOR", "LAYSHFON TERMINATED", "SHASHABON", "SHAFON", "SHASHABON IS WATCHING", "THE SHAFON ARE WATCHING"];
 const ghosts=[];
-function spawnWord(){const l=320+Math.random()*120;ghosts.push({t:words[Math.random()*words.length|0],x:Math.random()*W,y:70+Math.random()*(H-140),s:14+Math.random()*12,life:l,max:l})}
+function spawnWord(){
+  const l=320+Math.random()*120;let y=70+Math.random()*(H-140);
+  if(W<700){ // phones only: use the free space above/below the box, never on top of it
+    const r=document.querySelector('.container').getBoundingClientRect(),z=[];
+    if(r.top>90)z.push([46,r.top-22]);
+    if(H-r.bottom>90)z.push([r.bottom+34,H-28]);
+    if(!z.length)return;
+    const q=z[Math.random()*z.length|0];y=q[0]+Math.random()*(q[1]-q[0]);
+  }
+  ghosts.push({t:words[Math.random()*words.length|0],x:Math.random()*W,y:y,s:14+Math.random()*12,life:l,max:l});
+}
 const eyes=[];
 function spawnEye(){eyes.push({x:Math.random()*W,y:Math.random()*H,life:60+Math.random()*90,s:6+Math.random()*10})}
 function drawGlitch(){
@@ -194,7 +204,7 @@ function drawGlitch(){
   if(Math.random()<.35)spawnFrag();
   if(Math.random()<.004&&eyes.length<4)spawnEye();
   if(Math.random()<.01&&ghosts.length<3)spawnWord();
-  const T=W<700?wx:tx; // on phones the words float above the box so they stay visible
+  const T=tx;
   for(let i=ghosts.length-1;i>=0;i--){
     const o=ghosts[i],al=Math.min(1,(o.max-o.life)/50,o.life/50);
     T.font=o.s+'px Creepster, cursive';
@@ -401,32 +411,33 @@ function openGame(){
   $('music').pause(); // total silence while you play
   $('game').style.display='block';gc.width=innerWidth;gc.height=innerHeight;
   G={open:true,run:false};
-  showMsg('<h2>FIND THE LOST SOULS</h2><p>Seven souls hide in the dark.<br>Move your light over a soul to take it.<br>You have 35 seconds. Do not let it reach you.</p><button class="signal-btn" id="go">ENTER THE DARK</button>');
+  showMsg('<h2>FIND THE LOST SOULS</h2><p>'+(innerWidth<700?'Eight souls hide in the dark.<br>Move your light over each one to take it.<br>The light will die without warning.<br>You have 32 seconds. It is already close.':'Seven souls hide in the dark.<br>Move your light over a soul to take it.<br>You have 35 seconds. Do not let it reach you.')+'</p><button class="signal-btn" id="go">ENTER THE DARK</button>');
   $('go').onclick=startGame;
 }
 function showMsg(html){$('msg').innerHTML=html;$('msg').style.display='flex'}
 function closeGame(quiet){if(!G)return;G.open=false;G.run=false;$('game').style.display='none';if(!quiet&&Snd.on)$('music').play().catch(()=>{})}
 function startGame(){
   $('msg').style.display='none';
-  const w=gc.width,h=gc.height;
-  G={open:true,run:true,t0:performance.now(),found:0,total:7,px:w/2,py:h/2,
-     souls:Array.from({length:7},()=>({x:60+Math.random()*(w-120),y:60+Math.random()*(h-120),got:false,ph:Math.random()*6})),
+  const w=gc.width,h=gc.height,mob=innerWidth<700;
+  G={open:true,run:true,t0:performance.now(),found:0,total:mob?8:7,mob,T:mob?32:35,sp0:mob?.85:.55,spk:mob?.06:.045,px:w/2,py:h/2,
+     souls:Array.from({length:mob?8:7},()=>({x:60+Math.random()*(w-120),y:60+Math.random()*(h-120),got:false,ph:Math.random()*6})),
      shade:{x:Math.random()<.5?0:w,y:Math.random()*h,sp:.55}};
   requestAnimationFrame(gameLoop);
 }
 function pos(e){const r=gc.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top-(e.pointerType==='touch'?50:0)}}
 ['pointermove','pointerdown'].forEach(ev=>gc.addEventListener(ev,e=>{
   if(!G||!G.run)return;const p=pos(e);G.px=p.x;G.py=p.y;G.touch=e.pointerType==='touch';
-  if(ev==='pointerdown')G.souls.forEach(s=>{if(!s.got&&Math.hypot(s.x-p.x,s.y-p.y)<(e.pointerType==='touch'?40:28)){s.got=true;G.found++;Snd.hit()}});
+  if(ev==='pointerdown')G.souls.forEach(s=>{if(!s.got&&Math.hypot(s.x-p.x,s.y-p.y)<(e.pointerType==='touch'?30:28)){s.got=true;G.found++;Snd.hit()}});
 }));
 function gameLoop(now){
   if(!G||!G.run)return;
-  const w=gc.width,h=gc.height,left=35-(now-G.t0)/1000;
+  const w=gc.width,h=gc.height,left=G.T-(now-G.t0)/1000;
   g.fillStyle='#000';g.fillRect(0,0,w,h);
   // shadow stalks the light, speeding up as time runs out
   const s=G.shade,dx=G.px-s.x,dy=G.py-s.y,d=Math.hypot(dx,dy)||1;
-  s.sp=.55+(35-left)*.045;s.x+=dx/d*s.sp;s.y+=dy/d*s.sp;
-  const R=(innerWidth<700?80:130)+Math.sin(now*.02)*(Math.random()*6); // flickering light
+  s.sp=G.sp0+(G.T-left)*G.spk;if(G.mob&&((now-G.t0)%7000)>6500&&d<320)s.sp*=3.2;s.x+=dx/d*s.sp;s.y+=dy/d*s.sp;
+  const dark=G.mob&&((now-G.t0)%5200)>4850; // phones: the light dies for a moment, again and again
+  const R=dark?0:(innerWidth<700?80:130)+Math.sin(now*.02)*(Math.random()*6); // flickering light
   // draw things only inside light
   g.save();g.beginPath();g.arc(G.px,G.py,R,0,7);g.clip();
   const gr=g.createRadialGradient(G.px,G.py,10,G.px,G.py,R);gr.addColorStop(0,'#2a0505');gr.addColorStop(1,'#000');
@@ -441,8 +452,8 @@ function gameLoop(now){
   g.restore();
   // faint breadcrumb: souls glow weakly through the dark when close
   G.souls.forEach(o=>{if(o.got)return;const dd=Math.hypot(o.x-G.px,o.y-G.py);
-    if(dd>R&&dd<R+120){g.fillStyle=`rgba(255,60,60,${(1-(dd-R)/120)*.25})`;g.beginPath();g.arc(o.x,o.y,4,0,7);g.fill()}});
-  G.souls.forEach(o=>{if(!o.got&&Math.hypot(o.x-G.px,o.y-G.py)<(G.touch?46:34)){o.got=true;G.found++;Snd.hit()}});
+    if(!dark&&dd>R&&dd<R+120){g.fillStyle=`rgba(255,60,60,${(1-(dd-R)/120)*.25})`;g.beginPath();g.arc(o.x,o.y,4,0,7);g.fill()}});
+  G.souls.forEach(o=>{if(!o.got&&Math.hypot(o.x-G.px,o.y-G.py)<(G.touch?(G.mob?30:46):34)){o.got=true;G.found++;Snd.hit()}});
   $('hud').innerText=`SOULS ${G.found}/${G.total}   ·   ${Math.max(0,left).toFixed(1)}s`;
   if(G.found>=G.total){G.run=false;return win()}
   if(Math.hypot(s.x-G.px,s.y-G.py)<32||left<=0){G.run=false;return lose()}
